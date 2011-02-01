@@ -1,3 +1,7 @@
+Original blog post (January 3, 2011)
+http://vitobotta.com/serialisable-validatable-tableless-model/
+
+
 = Tableless Model
 
 This is an extended Hash that has a defined collection of method-like attributes, and only these attributes can be set or read from the hash. 
