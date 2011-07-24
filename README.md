@@ -132,6 +132,35 @@ title_tag: "changed title tag"
 noindex: false
 ``` 
 
+You can also pass a lambda/Proc when defining the default value of an attribute, so that the actual value will be calculated at runtime when a new instance of the tableless mode is being initialised:
+
+``` ruby
+class SeoOptions < ActiveRecord::TablelessModel
+
+  attribute :created_at, :type => :time, :default => lambda { Time.now }   
+
+end
+
+```
+
+Then, when the tableless model is initialised together with the parent model, the default value will be calculated and assigned in that moment:
+
+``` ruby
+>> SeoOptions.new
+=> <#SeoOptions created_at_=Sun Jul 24 19:26:33 +0100 2011>
+>> SeoOptions.new
+=> <#SeoOptions created_at_=Sun Jul 24 19:26:37 +0100 2011>
+>> SeoOptions.new
+=> <#SeoOptions created_at_=Sun Jul 24 19:26:43 +0100 2011>
+```
+
+Of course, if a value is specified for an attribute when creating an instance of the tableless mode, the default value specified for that attribute will be ignored, including lambdas/procs:
+
+``` ruby
+>> SeoOptions.new :created_at => Time.local(2011, 7, 24, 18, 47, 0)
+=> <#SeoOptions created_at=Sun Jul 24 18:47:00 +0100 2011>
+```
+
 ## Validations
 
 Tableless Model uses the Validatable gem to support validations methods and callbacks (such as "after_validation").
@@ -186,6 +215,10 @@ x.valid?
 * Make your feature addition or bug fix.
 * Add specs for it, making sure all specs green.
 * Commit, and send me a pull request.
+
+## Change log
+
+24.07.2011 - Added support for passing Proc/lamba when defining the default attribute of a value
 
 ## License
 

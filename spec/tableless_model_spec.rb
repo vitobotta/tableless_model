@@ -9,6 +9,7 @@ class ModelOptions < ActiveRecord::TablelessModel
   attribute :no_type_attribute, :default => 111
   attribute :typed_attribute,   :default => 5, :type => :integer 
   attribute :typed_attribute_no_default_value,  :type => :integer 
+  attribute :attribute_with_proc_default_value, :type => :time, :default => lambda { Time.now }  
 end
 
 class TestModel < ActiveRecord::Base
@@ -18,13 +19,15 @@ end
 describe TestModel do
   let(:test_model)  { subject }
   let(:options)     { test_model.options }  
+  let(:frozen_time) { Time.local(2011, 7, 24, 18, 47, 0).in_time_zone("Europe/London") }
   let(:test_values) do
     {
       :no_default_value_no_type_attribute => "no_default_value_no_type_attribute",
       :no_default_value_typed_attribute   => 4567,
       :no_type_attribute                  => "no_type_attribute",
       :typed_attribute                    => 8765,
-      :typed_attribute_no_default_value   => 34
+      :typed_attribute_no_default_value   => 34,
+      :attribute_with_proc_default_value => frozen_time
     }
   end
   
@@ -38,12 +41,17 @@ describe TestModel do
       test_model.options = test_values
     end
     
+    after(:each) do
+      TestModel.delete_all
+    end
+    
     it "the attributes have the expected values" do
       test_model.options.no_default_value_no_type_attribute.should == "no_default_value_no_type_attribute"
       test_model.options.no_default_value_typed_attribute.should == 4567
       test_model.options.no_type_attribute.should == "no_type_attribute"
       test_model.options.typed_attribute.should == 8765
       test_model.options.typed_attribute_no_default_value.should == 34
+      test_model.options.attribute_with_proc_default_value.should == frozen_time
     end
     
     it "forces the owner model to a changed state with partial_updates on" do
@@ -71,6 +79,7 @@ describe TestModel do
         instance.options.no_type_attribute.should == "no_type_attribute"
         instance.options.typed_attribute.should == 8765
         instance.options.typed_attribute_no_default_value.should == 34
+        instance.options.attribute_with_proc_default_value.should == frozen_time
       end
     end
   end
@@ -78,6 +87,17 @@ describe TestModel do
   describe "#options" do
     it "is an instance of the tableless model" do
       options.should be_instance_of ModelOptions
+    end
+    
+    it "sets the attributes to the expected default values" do
+      Timecop.freeze(frozen_time) do
+        test_model.options.no_default_value_no_type_attribute.should == ""
+        test_model.options.no_default_value_typed_attribute.should == 0
+        test_model.options.no_type_attribute.should == "111"
+        test_model.options.typed_attribute.should == 5
+        test_model.options.typed_attribute_no_default_value.should == 0
+        test_model.options.attribute_with_proc_default_value.should == frozen_time
+      end
     end
     
     it "honours the type of the attribute, when specified" do
@@ -122,7 +142,10 @@ describe TestModel do
     end
     
     it "shows the expected object-like output on inspect" do
-      options.inspect.should == "<#ModelOptions typed_attribute_no_default_value=0 no_default_value_no_type_attribute=\"\" no_default_value_typed_attribute=0 no_type_attribute=\"111\" typed_attribute=5>"
+      Timecop.freeze(frozen_time) do
+        instance = TestModel.new
+        instance.options.inspect.should == "<#ModelOptions typed_attribute_no_default_value=0 attribute_with_proc_default_value=Sun Jul 24 18:47:00 +0100 2011 no_default_value_no_type_attribute=\"\" no_default_value_typed_attribute=0 no_type_attribute=\"111\" typed_attribute=5>"
+      end
     end
     
     it "tries to enforce type casting if a type has been specified for an attribute" do
@@ -170,6 +193,35 @@ describe TestModel do
       options.__owner_object.should == test_model
       options.__serialized_attribute.should == :options
     end
+
+    context "when a proc is passed to define the default value of an attribute" do
+      context "and a new instance of the parent model is being created" do
+        it "allows passing a Proc/lambda to define a default value at runtime" do
+          Timecop.freeze(frozen_time) do
+            TestModel.new.options.attribute_with_proc_default_value.should == frozen_time
+          end
+        end
+      end
+      
+      context "and an existing instance of the parent model is read from database" do
+        let(:some_other_time) { Time.local(2011, 6, 30, 15, 22, 0).in_time_zone("Europe/London") }
+        
+        before(:each) do
+          Timecop.freeze(frozen_time) { TestModel.create({ :options => test_values }) }
+        end
+        
+        after(:each) do
+          TestModel.delete_all
+        end
+
+        it "does not execute the proc, but sets the attribute to the expected value from database" do
+          Timecop.freeze(some_other_time) do
+            TestModel.first.options.attribute_with_proc_default_value.should == frozen_time
+          end
+        end
+      end
+    end
+
   end
 
 end

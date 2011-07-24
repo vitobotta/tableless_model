@@ -12,8 +12,9 @@ module Tableless
     def initialize(init_attributes = {}, &block)
       super &block
 
-      self.class.attributes.each_pair {|attribute_name, options| self.send("#{attribute_name}=".to_sym, options[:default])}
-      init_attributes.each_pair {|k,v| self.send("#{k}=".to_sym, v)} if init_attributes
+      self.class.attributes.each_pair {|attribute_name, options| self.send("#{attribute_name}=".to_sym, options[:default].is_a?(Proc) ? options[:default].call : options[:default])}
+      # init_attributes.each_pair {|k,v| self.send("#{k}=".to_sym, v)} if init_attributes
+      init_attributes.each_pair {|k,v| self[k] = v } if init_attributes
     end
 
 
@@ -35,7 +36,8 @@ module Tableless
     # 
     def [](attribute_name)
       raise NoMethodError, "The attribute #{attribute_name} is undefined" unless self.class.attributes.has_key? attribute_name
-      self.class.cast(attribute_name, super(attribute_name))
+      default = super(attribute_name)
+      self.class.cast(attribute_name, default.is_a?(Proc) ? default.call : default)
     end
 
 
