@@ -22,7 +22,7 @@ Tableless Model is available as a Rubygem:
 gem install tableless_model
 ``` 		
 
-== Usage
+## Usage
 
 For example's sake, say we have these two models:
 
@@ -266,7 +266,10 @@ x.valid?
 
 ## Change log
 
-24.07.2011 - Added support for passing Proc/lamba when defining the default attribute of a value
+24.07.2011 
+  - Added support for passing Proc/lamba when defining the default attribute of a value
+  - Added shortcuts to call getters/setters of attributes defined in a tableless model, from
+    its parent model directly
 
 ## License
 
