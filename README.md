@@ -149,7 +149,7 @@ class SeoOptions < ActiveRecord::TablelessModel
   attribute :nofollow,          :type => :boolean, :default => false 
   attribute :noarchive,         :type => :boolean, :default => false 
 
-	validates_presence_of :meta_keywords
+  validates_presence_of :meta_keywords
 	
 end
 ``` 
