@@ -2,7 +2,7 @@ Original blog post (January 3, 2011)
 http://vitobotta.com/serialisable-validatable-tableless-model/
 
 
-= Tableless Model
+# Tableless Model
 
 This is an extended Hash that has a defined collection of method-like attributes, and only these attributes can be set or read from the hash. 
 Optionally, you can also set default values and enforce data types for these attributes.
@@ -14,7 +14,7 @@ In particular, by using Tableless Model, you could save tables whenever you have
 Removing database tables also means reducing the number of queries to fetch associations, therefore it can also help a little bit with performance.
 
 
-== Installation
+## Installation
 
 Tableless Model is available as a Rubygem:
 
@@ -91,8 +91,7 @@ When you now create an instance of SeoOptions, you can get and set its attribute
 
 ``` ruby
 seo_options = SeoOptions.new
- 	=> <#SeoOptions meta_description="" meta_keywords="" noarchive=false nofollow=false noindex=false
- 	title_tag="default title tag">
+ 	=> <#SeoOptions meta_description="" meta_keywords="" noarchive=false nofollow=false noindex=false title_tag="default title tag">
 
 seo_options.title_tag
 	=> "default title tag"
@@ -106,8 +105,7 @@ Of course, you can also override the default values for the attributes when crea
 
 ``` ruby
 seo_options = SeoOptions.new( :title_tag => "a different title tag" )
- 	=> <#SeoOptions meta_description="" meta_keywords="" noarchive=false nofollow=false noindex=false 
-	title_tag="a different title tag">
+ 	=> <#SeoOptions meta_description="" meta_keywords="" noarchive=false nofollow=false noindex=false title_tag="a different title tag">
 ``` 
 
 Now, if you have used the has_tabless macro in the parent class, Page, each instance of Page will store directly its YAML-serialized SEO settings in the column named "seo". 
@@ -116,12 +114,10 @@ Now, if you have used the has_tabless macro in the parent class, Page, each inst
 page = Page.new
 
 page.seo
- 	=> <#SeoOptions meta_description="" meta_keywords="" noarchive=false nofollow=false noindex=false
- 	title_tag="default title tag">
+ 	=> <#SeoOptions meta_description="" meta_keywords="" noarchive=false nofollow=false noindex=false title_tag="default title tag">
 
 page.seo.title_tag = "changed title tag"
- 	=> <#SeoOptions meta_description="" meta_keywords="" noarchive=false nofollow=false noindex=false
- 	title_tag="changed title tag">
+ 	=> <#SeoOptions meta_description="" meta_keywords="" noarchive=false nofollow=false noindex=false title_tag="changed title tag">
 ``` 
 
 And this is how the content of the serialized column would look like in the database if you saved the changes as in the example
@@ -136,7 +132,7 @@ title_tag: "changed title tag"
 noindex: false
 ``` 
 
-== Validations
+## Validations
 
 Tableless Model uses the Validatable gem to support validations methods and callbacks (such as "after_validation").
 Note: it currently uses the Rails 2.x syntax only.
@@ -162,8 +158,7 @@ Testing:
 
 ``` ruby
 x = SeoOptionsSettings.new
- => <#SeoOptions meta_description="" meta_keywords="" noarchive=false nofollow=false noindex=false 
-title_tag="">
+ => <#SeoOptions meta_description="" meta_keywords="" noarchive=false nofollow=false noindex=false title_tag="">
 
 x.valid?
  => false
@@ -175,12 +170,12 @@ x.valid?
  => true 
 ``` 
 
-== TODO
+## TODO
 
 * Support for associations
 
 
-== Authors
+## Authors
 
 * Vito Botta ( http://vitobotta.com )
 
