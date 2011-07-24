@@ -168,9 +168,6 @@ describe TestModel do
 
     it "remembers who is the owner model, so that it can be forced to a changed state when any attributes change" do
       options.__owner_object.should == test_model
-    end
-    
-    it "sets the accessor __serialized_attribute to the name of its column that stored the tableless model instance, serialized" do
       options.__serialized_attribute.should == :options
     end
   end
