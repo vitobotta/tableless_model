@@ -216,6 +216,10 @@ x.valid?
 * Add specs for it, making sure all specs green.
 * Commit, and send me a pull request.
 
+## Compatibility
+
+* Tested with REE/1.8.7, 1.9.2
+
 ## Change log
 
 24.07.2011 - Added support for passing Proc/lamba when defining the default attribute of a value
