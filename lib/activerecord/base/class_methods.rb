@@ -1,6 +1,9 @@
 module Base
   module ClassMethods
 
+    attr_reader :tableless_models
+    
+    
     # 
     # 
     # Macro to attach a tableless model to a parent, table-based model.
@@ -24,6 +27,10 @@ module Base
     # 
     def has_tableless(column)
       column_name = column.class == Hash ? column.collect{|k,v| k}.first.to_sym : column
+
+      @tableless_models ||= []
+      @tableless_models << column_name
+      
       
       # if only the column name is given, the tableless model's class is expected to have that name, classified, as class name
       class_type = column.class == Hash ? column.collect{|k,v| v}.last : column.to_s.classify.constantize
@@ -35,7 +42,7 @@ module Base
 
         # Telling AR that the column has to store an instance of the given tableless model in 
         # YAML serialized format
-        serialize column_name, ActiveRecord::TablelessModel
+        serialize column_name
     
         # Adding getter for the serialized column,
         # making sure it always returns an instance of the specified tableless

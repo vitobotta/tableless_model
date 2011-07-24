@@ -15,21 +15,20 @@ module Tableless
     # 
     # 
     def attribute(name, options = {})
-      # Stringifies all keys... uses a little more memory but it's a bit easier to handle keys internally...
       attribute_name = name.to_s
     
       # Defining the new attribute for the tableless model
-      self.attributes[attribute_name] = options
+      self.attributes[name] = options
     
       # Defining method-like getter and setter for the new attribute
       # so it can be used like a regular object's property
       class_eval %Q{
         def #{attribute_name}
-          self["#{attribute_name}"]
+          self[:#{attribute_name}]
         end
     
         def #{attribute_name}=(value)
-          self["#{attribute_name}"] = value
+          self[:#{attribute_name}] = value
         end
       }
     end
@@ -53,7 +52,7 @@ module Tableless
     # 
     # 
     def cast(attribute_name, value)
-      type = self.attributes[attribute_name.to_s][:type] || :string
+      type = self.attributes[attribute_name][:type] || :string
 
       return nil if value.nil? && ![:string, :integer, :boolean, :float, :decimal].include?(type)
     

@@ -1,7 +1,12 @@
-require "validatable"
-require File.expand_path(File.join(File.dirname(__FILE__), "activerecord/base/class_methods"))
+$LOAD_PATH.unshift(File.dirname(__FILE__))
 
-Dir[File.join(File.dirname(__FILE__), "tableless_model/*rb")].each {|f| require File.expand_path(f)}
+require "validatable"
+require "activerecord/base/class_methods"
+require "activerecord/base/instance_methods"
+require "tableless_model/class_methods"
+require "tableless_model/instance_methods"
+require "tableless_model/version"
+
 
 module ActiveRecord
   

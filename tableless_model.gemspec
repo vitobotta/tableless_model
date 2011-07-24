@@ -14,9 +14,10 @@ Gem::Specification.new do |s|
   s.description = %q{A serialisable and validatable table-less model with support for associations, useful to store settings, options, etc in a serialized form in a parent object}
 
   s.add_dependency "validatable"
-  s.add_development_dependency "minitest"
-  s.add_development_dependency "ansi"
   s.add_development_dependency "sqlite3"
+  s.add_development_dependency "activerecord"
+  s.add_development_dependency "rspec"
+  s.add_development_dependency "timecop"
   
   s.rubyforge_project = "tableless_model"
 

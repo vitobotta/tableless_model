@@ -12,8 +12,8 @@ module Tableless
     def initialize(init_attributes = {}, &block)
       super &block
 
-      self.class.attributes.each_pair {|attribute_name, options| self.send("#{attribute_name}=", options[:default])}
-      init_attributes.each_pair {|k,v| self.send("#{k}=", v)} if init_attributes
+      self.class.attributes.each_pair {|attribute_name, options| self.send("#{attribute_name}=".to_sym, options[:default].is_a?(Proc) ? options[:default].call : options[:default])}
+      init_attributes.each_pair {|k,v| self[k] = v } if init_attributes
     end
 
 
@@ -34,8 +34,9 @@ module Tableless
     # so that only the defined attributes can be read 
     # 
     def [](attribute_name)
-      raise NoMethodError, "The attribute #{attribute_name} is undefined" unless self.class.attributes.has_key? attribute_name.to_s
-      self.class.cast(attribute_name, super(attribute_name.to_s))
+      raise NoMethodError, "The attribute #{attribute_name} is undefined" unless self.class.attributes.has_key? attribute_name
+      default = super(attribute_name)
+      self.class.cast(attribute_name, default.is_a?(Proc) ? default.call : default)
     end
 
 
@@ -45,9 +46,9 @@ module Tableless
     # so that only the defined attributes can be set
     # 
     def []=(attribute_name, value)
-      raise NoMethodError, "The attribute #{attribute_name} is undefined" unless self.class.attributes.has_key? attribute_name.to_s
+      raise NoMethodError, "The attribute #{attribute_name} is undefined" unless self.class.attributes.has_key? attribute_name
       
-      return_value = super(attribute_name.to_s, self.class.cast(attribute_name, value))
+      return_value = super(attribute_name, self.class.cast(attribute_name, value))
 
       if self.__owner_object 
         # This makes the tableless model compatible with partial_updates:
@@ -72,7 +73,10 @@ module Tableless
     #   "<#MyTablelessModel a=1 b=2>"
     # 
     def inspect
-      "<##{self.class.to_s}" << self.keys.sort.inject(""){|result, k| result << " #{k}=#{self[k].inspect}"; result }  << ">"
+      "<##{self.class.to_s}" << self.keys.sort{ |a,b| a.to_s <=> b.to_s  }.inject("") do |result, k| 
+        result += " #{k}=#{ self[k].is_a?(Time) ? self[k].strftime("%Y-%m-%d %H:%M:%S %Z") : self[k].inspect}"
+        result 
+      end + ">"
     end
     
     
@@ -83,6 +87,24 @@ module Tableless
     # 
     def merge(hash)
       raise NoMethodError
+    end
+
+    
+    # 
+    # allows calls to attribute_name?, returning a true or false depending
+    # on whether the actual value of the attribute is truthy or falsy
+    # 
+    def method_missing sym, *args, &block
+      attribute_name = sym.to_s.gsub(/^(.*)\?$/, "\\1")
+      if respond_to?(attribute_name)
+        !!send(attribute_name, *args, &block) 
+      else
+        super sym, *args, &block
+      end
+    end
+
+    def respond_to?(method)
+      super || self.class.attributes.keys.include?(method) || self.class.attributes.keys.include?("#{method}=".to_sym) || super(method.to_s.gsub(/^(.*)\?$/, "\\1"))
     end
 
   end
