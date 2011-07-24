@@ -172,10 +172,22 @@ x.valid?
 
 ## TODO
 
+* Update validations syntax to that of Rails 3
 * Support for associations
 
 
 ## Authors
 
 * Vito Botta ( http://vitobotta.com )
+
+## Contributing
+
+* Fork the project on Github.
+* Make your feature addition or bug fix.
+* Add specs for it, making sure all specs green.
+* Commit, and send me a pull request.
+
+## License
+
+MIT License. Copyright 2010 Vito Botta. http://vitobotta.com
 

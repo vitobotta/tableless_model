@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    tableless_model (0.0.4)
+    tableless_model (0.0.7)
       validatable
 
 GEM
@@ -24,4 +24,3 @@ DEPENDENCIES
   minitest
   sqlite3
   tableless_model!
-  validatable
