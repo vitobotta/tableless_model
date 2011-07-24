@@ -18,10 +18,9 @@ Removing database tables also means reducing the number of queries to fetch asso
 
 Tableless Model is available as a Rubygem:
 
-		gem install tableless_model
-
-		(current version: 0.0.7)
-		
+``` bash
+gem install tableless_model
+``` 		
 
 == Usage
 
@@ -41,17 +40,18 @@ end
 
 2) 
 
-		class SeoOptions < ActiveRecord::Base
+``` ruby
+class SeoOptions < ActiveRecord::Base
 
-			set_table_name "seo_options"
+	set_table_name "seo_options"
 
-			# having columns such as id, title_tag, meta_description, meta_keywords, 
-			# noindex, nofollow, noarchive, page_id
+	# having columns such as id, title_tag, meta_description, meta_keywords, 
+	# noindex, nofollow, noarchive, page_id
 
-			belongs_to :page
+	belongs_to :page
 
-		end
-
+end
+```
 
 So that each instance of Page has its own SEO options, and these options/settings only belong to a page, so we have a one to one association, and our database will have the tables "pages", and "seo_options".
 
@@ -60,72 +60,81 @@ Using Tableless Model, we could remove the association and the table seo_options
 
 1)
 
-		class Page < ActiveRecord::Base
+``` ruby
+class Page < ActiveRecord::Base
 
-			# having columns such as id, title, seo, etc
+	# having columns such as id, title, seo, etc
 
-			has_tableless :seo => SeoOptions
-	
-		end
+	has_tableless :seo => SeoOptions
+
+end
+```
 
 2) 
 
-		class SeoOptions < ActiveRecord::TablelessModel
+``` ruby
+class SeoOptions < ActiveRecord::TablelessModel
 
-		  attribute :title_tag,         :type => :string,  :default => "default title tag"
-		  attribute :meta_description,  :type => :string,  :default => ""  
-		  attribute :meta_keywords,     :type => :string,  :default => ""  
-		  attribute :noindex,           :type => :boolean, :default => false 
-		  attribute :nofollow,          :type => :boolean, :default => false 
-		  attribute :noarchive,         :type => :boolean, :default => false 
+  attribute :title_tag,         :type => :string,  :default => "default title tag"
+  attribute :meta_description,  :type => :string,  :default => ""  
+  attribute :meta_keywords,     :type => :string,  :default => ""  
+  attribute :noindex,           :type => :boolean, :default => false 
+  attribute :nofollow,          :type => :boolean, :default => false 
+  attribute :noarchive,         :type => :boolean, :default => false 
 
-		end
-
+end
+``` 
 
 That's it. 
 
 When you now create an instance of SeoOptions, you can get and set its attributes as you would do with a normal model:
 
-		seo_options = SeoOptions.new
-		 	=> <#SeoOptions meta_description="" meta_keywords="" noarchive=false nofollow=false noindex=false
-		 	title_tag="default title tag">
+``` ruby
+seo_options = SeoOptions.new
+ 	=> <#SeoOptions meta_description="" meta_keywords="" noarchive=false nofollow=false noindex=false
+ 	title_tag="default title tag">
 
-		seo_options.title_tag
-			=> "default title tag"
+seo_options.title_tag
+	=> "default title tag"
 
-		seo_options.title_tag = "new title tag"
-			=> "new title tag"
+seo_options.title_tag = "new title tag"
+	=> "new title tag"
+``` 
 			
 Note that inspect	shows the properties of the Tableless Model in the same way it does for ActiveRecord models.
 Of course, you can also override the default values for the attributes when creating a new instance:
 
-		seo_options = SeoOptions.new( :title_tag => "a different title tag" )
-		 	=> <#SeoOptions meta_description="" meta_keywords="" noarchive=false nofollow=false noindex=false 
-			title_tag="a different title tag">
+``` ruby
+seo_options = SeoOptions.new( :title_tag => "a different title tag" )
+ 	=> <#SeoOptions meta_description="" meta_keywords="" noarchive=false nofollow=false noindex=false 
+	title_tag="a different title tag">
+``` 
 
 Now, if you have used the has_tabless macro in the parent class, Page, each instance of Page will store directly its YAML-serialized SEO settings in the column named "seo". 
 
-		page = Page.new
-		
-		page.seo
-		 	=> <#SeoOptions meta_description="" meta_keywords="" noarchive=false nofollow=false noindex=false
-		 	title_tag="default title tag">
+``` ruby
+page = Page.new
 
-		page.seo.title_tag = "changed title tag"
-		 	=> <#SeoOptions meta_description="" meta_keywords="" noarchive=false nofollow=false noindex=false
-		 	title_tag="changed title tag">
+page.seo
+ 	=> <#SeoOptions meta_description="" meta_keywords="" noarchive=false nofollow=false noindex=false
+ 	title_tag="default title tag">
 
+page.seo.title_tag = "changed title tag"
+ 	=> <#SeoOptions meta_description="" meta_keywords="" noarchive=false nofollow=false noindex=false
+ 	title_tag="changed title tag">
+``` 
 
 And this is how the content of the serialized column would look like in the database if you saved the changes as in the example
 
-		--- !map:SeoOptions 
-		noarchive: false
-		meta_description: 
-		meta_keywords: 
-		nofollow: false
-		title_tag: "changed title tag"
-		noindex: false
-
+``` yaml
+--- !map:SeoOptions 
+noarchive: false
+meta_description: 
+meta_keywords: 
+nofollow: false
+title_tag: "changed title tag"
+noindex: false
+``` 
 
 == Validations
 
@@ -134,36 +143,37 @@ Note: it currently uses the Rails 2.x syntax only.
 
 Example:
 
+``` ruby
+class SeoOptions < ActiveRecord::TablelessModel
 
-		class SeoOptions < ActiveRecord::TablelessModel
+  attribute :title_tag,         :type => :string,  :default => ""
+  attribute :meta_description,  :type => :string,  :default => ""  
+  attribute :meta_keywords,     :type => :string,  :default => ""  
+  attribute :noindex,           :type => :boolean, :default => false 
+  attribute :nofollow,          :type => :boolean, :default => false 
+  attribute :noarchive,         :type => :boolean, :default => false 
 
-		  attribute :title_tag,         :type => :string,  :default => ""
-		  attribute :meta_description,  :type => :string,  :default => ""  
-		  attribute :meta_keywords,     :type => :string,  :default => ""  
-		  attribute :noindex,           :type => :boolean, :default => false 
-		  attribute :nofollow,          :type => :boolean, :default => false 
-		  attribute :noarchive,         :type => :boolean, :default => false 
-
-			validates_presence_of :meta_keywords
-			
-		end
-
+	validates_presence_of :meta_keywords
+	
+end
+``` 
 
 Testing:
 
-		x = SeoOptionsSettings.new
-		 => <#SeoOptions meta_description="" meta_keywords="" noarchive=false nofollow=false noindex=false 
-		title_tag="">
+``` ruby
+x = SeoOptionsSettings.new
+ => <#SeoOptions meta_description="" meta_keywords="" noarchive=false nofollow=false noindex=false 
+title_tag="">
 
-		x.valid?
-		 => false
-		
-		x.meta_keywords = "test"
-		 => "test"
-		
-		x.valid?
-		 => true 
+x.valid?
+ => false
 
+x.meta_keywords = "test"
+ => "test"
+
+x.valid?
+ => true 
+``` 
 
 == TODO
 
