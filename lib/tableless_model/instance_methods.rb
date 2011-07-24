@@ -13,7 +13,6 @@ module Tableless
       super &block
 
       self.class.attributes.each_pair {|attribute_name, options| self.send("#{attribute_name}=".to_sym, options[:default].is_a?(Proc) ? options[:default].call : options[:default])}
-      # init_attributes.each_pair {|k,v| self.send("#{k}=".to_sym, v)} if init_attributes
       init_attributes.each_pair {|k,v| self[k] = v } if init_attributes
     end
 
@@ -74,7 +73,10 @@ module Tableless
     #   "<#MyTablelessModel a=1 b=2>"
     # 
     def inspect
-      "<##{self.class.to_s}" << self.keys.inject(""){|result, k| result << " #{k}=#{self[k].inspect}"; result }  << ">"
+      "<##{self.class.to_s}" << self.keys.sort{ |a,b| a.to_s <=> b.to_s  }.inject("") do |result, k| 
+        result += " #{k}=#{ self[k].is_a?(Time) ? self[k].strftime("%Y-%m-%d %H:%M:%S %Z") : self[k].inspect}"
+        result 
+      end + ">"
     end
     
     

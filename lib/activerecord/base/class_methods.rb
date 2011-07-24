@@ -35,7 +35,7 @@ module Base
 
         # Telling AR that the column has to store an instance of the given tableless model in 
         # YAML serialized format
-        serialize column_name, ActiveRecord::TablelessModel
+        serialize column_name
     
         # Adding getter for the serialized column,
         # making sure it always returns an instance of the specified tableless

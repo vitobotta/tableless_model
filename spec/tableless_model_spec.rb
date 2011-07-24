@@ -144,7 +144,7 @@ describe TestModel do
     it "shows the expected object-like output on inspect" do
       Timecop.freeze(frozen_time) do
         instance = TestModel.new
-        instance.options.inspect.should == "<#ModelOptions typed_attribute_no_default_value=0 attribute_with_proc_default_value=Sun Jul 24 18:47:00 +0100 2011 no_default_value_no_type_attribute=\"\" no_default_value_typed_attribute=0 no_type_attribute=\"111\" typed_attribute=5>"
+        instance.options.inspect.should == "<#ModelOptions attribute_with_proc_default_value=2011-07-24 18:47:00 BST no_default_value_no_type_attribute=\"\" no_default_value_typed_attribute=0 no_type_attribute=\"111\" typed_attribute=5 typed_attribute_no_default_value=0>"
       end
     end
     
