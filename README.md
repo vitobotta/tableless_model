@@ -169,11 +169,6 @@ So, for instance, if you have the tableless model:
 class SeoOptions < ActiveRecord::TablelessModel
 
   attribute :title_tag,         :type => :string,  :default => "default title tag"
-  attribute :meta_description,  :type => :string,  :default => ""  
-  attribute :meta_keywords,     :type => :string,  :default => ""  
-  attribute :noindex,           :type => :boolean, :default => false 
-  attribute :nofollow,          :type => :boolean, :default => false 
-  attribute :noarchive,         :type => :boolean, :default => false 
 
 end
 ```
