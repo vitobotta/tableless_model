@@ -161,6 +161,55 @@ Of course, if a value is specified for an attribute when creating an instance of
 => <#SeoOptions created_at=Sun Jul 24 18:47:00 +0100 2011>
 ```
 
+For each of the attribute defined in the tableless model, shortcuts for both setter and getter are automatically defined in the parent model, unless the parent model already has a method of its own by the same name.
+
+So, for instance, if you have the tableless model:
+
+``` ruby
+class SeoOptions < ActiveRecord::TablelessModel
+
+  attribute :title_tag,         :type => :string,  :default => "default title tag"
+  attribute :meta_description,  :type => :string,  :default => ""  
+  attribute :meta_keywords,     :type => :string,  :default => ""  
+  attribute :noindex,           :type => :boolean, :default => false 
+  attribute :nofollow,          :type => :boolean, :default => false 
+  attribute :noarchive,         :type => :boolean, :default => false 
+
+end
+```
+
+which is used by a parent model:
+
+``` ruby
+class Page < ActiveRecord::Base
+
+	has_tableless :seo => SeoOptions
+
+end
+```
+
+you can get/set attributes of the tableless model directly from the parent model:
+
+
+``` ruby
+# this...
+>> page.title_tag
+=> "default title tag"
+
+# is same as...
+>> page.seo_options.title_tag
+=> "default title tag"
+```
+
+For boolean attributes (or also truthy/falsy ones) you can also make calls to special getters ending with "?", so to get true or false in return, depending on the actual value of the attribute:
+
+``` ruby
+# this...
+>> page.title_tag?
+=> true
+```
+
+
 ## Validations
 
 Tableless Model uses the Validatable gem to support validations methods and callbacks (such as "after_validation").

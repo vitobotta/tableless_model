@@ -89,5 +89,23 @@ module Tableless
       raise NoMethodError
     end
 
+    
+    # 
+    # allows calls to attribute_name?, returning a true or false depending
+    # on whether the actual value of the attribute is truthy or falsy
+    # 
+    def method_missing sym, *args, &block
+      attribute_name = sym.to_s.gsub(/^(.*)\?$/, "\\1")
+      if respond_to?(attribute_name)
+        !!send(attribute_name, *args, &block) 
+      else
+        super sym, *args, &block
+      end
+    end
+
+    def respond_to?(method)
+      super || self.class.attributes.keys.include?(method) || self.class.attributes.keys.include?("#{method}=".to_sym) || super(method.to_s.gsub(/^(.*)\?$/, "\\1"))
+    end
+
   end
 end

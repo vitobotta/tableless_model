@@ -1,7 +1,7 @@
 require "spec_helper"
 
 ActiveRecord::Base.establish_connection(:adapter => "sqlite3", :database => ":memory:")
-ActiveRecord::Base.connection.execute(" create table test_models (options varchar(50)) ")
+ActiveRecord::Base.connection.execute(" create table test_models (id integer, options varchar(50)) ")
 
 class ModelOptions < ActiveRecord::TablelessModel
   attribute :no_default_value_no_type_attribute
@@ -80,6 +80,35 @@ describe TestModel do
         instance.options.typed_attribute.should == 8765
         instance.options.typed_attribute_no_default_value.should == 34
         instance.options.attribute_with_proc_default_value.should == frozen_time
+      end
+    end
+  end
+
+  context "when receives a message with the name of an attribute in the tableless model" do
+    before(:each) do
+      test_model.options = test_values
+    end
+    
+    context "and it doesn't have a method of its own by that name" do
+      it "delegates the method call to the tableless model" do
+        test_values.each do |k, v|
+          test_model.send(k).should == v
+        end
+      end
+
+      it "delegates setters too" do
+        instance = TestModel.new
+        
+        test_values.each do |k, v|
+          instance.send("#{k}=", v)
+          instance.options.send(k).should == v
+        end
+      end
+
+      it "can delegate calls to attribute_name?" do
+        test_values.each do |k, v|
+          test_model.send("#{k}?").should == !!v
+        end
       end
     end
   end

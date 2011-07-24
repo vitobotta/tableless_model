@@ -1,6 +1,9 @@
 module Base
   module ClassMethods
 
+    attr_reader :tableless_models
+    
+    
     # 
     # 
     # Macro to attach a tableless model to a parent, table-based model.
@@ -24,6 +27,10 @@ module Base
     # 
     def has_tableless(column)
       column_name = column.class == Hash ? column.collect{|k,v| k}.first.to_sym : column
+
+      @tableless_models ||= []
+      @tableless_models << column_name
+      
       
       # if only the column name is given, the tableless model's class is expected to have that name, classified, as class name
       class_type = column.class == Hash ? column.collect{|k,v| v}.last : column.to_s.classify.constantize
