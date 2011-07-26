@@ -204,6 +204,24 @@ For boolean attributes (or also truthy/falsy ones) you can also make calls to sp
 => true
 ```
 
+## Encryption
+
+If for some reason you'd like to encrypt the data serialised with the tableless model, so that it cannot be read in clear when looking directly at the contents of the database, you can enable encryption by simply specifying an encryption key:
+
+``` ruby
+class SomeModel < ActiveRecord::Base
+
+	has_tableless :seo => EncryptedTablelessModel, :encryption_key => "a398bbfaac38c79e60a6e398efba8571"
+
+end
+```
+
+In the database, the encrypted tableless model will look similar to this:
+
+``` ruby
+Fxq8TU8syHgWBk1ndGt6U5pXZDbDVs3+lLFcxWkvc3b9OONp02RBf+vkmwl2O5VIZpPVqkMiM3Y3zsv5B2N9sXP1eb7Erskq5T3A3oclHoiXvvPizbKbe0T+pulUdbd+GWka8UYHT1FE/vRNAb6o+F83plL6m8ctWTWafM/skqzVXing1FBqpK0Iv+9H8cK3rOjdxdaWT4RMqvRG//MAsAl8gBor2dIdwbg2iap9j42JYSqua8RlGuPKzr/I4dwSYYO1ldg+gDYHRXLIJ//law==--ohQLUAuE4RU+btUyOibx7g==
+```
+
 
 ## Validations
 
@@ -266,6 +284,9 @@ x.valid?
 
 ## Change log
 
+26.07.2011
+  - Added support for encryption
+  
 24.07.2011 
   - Added support for passing Proc/lamba when defining the default attribute of a value
   - Added shortcuts to call getters/setters of attributes defined in a tableless model, from

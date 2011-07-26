@@ -14,42 +14,50 @@ module Base
     # 
     #     class Parent < ActiveRecord::Base
     #     
-    #       has_tableless :settings
+    #       has_tableless :settings => ParentSettings
     # 
     #       # or...
     # 
-    #       has_tableless :settings => ParentSettings
+    #       has_tableless :settings => ParentSettings, :encryption_key => "secret"
     # 
     #     end
     # 
     # 
     # NOTE: the serialized column is expected to be of type string or text in the database
-    # 
     def has_tableless(column)
-      column_name = column.class == Hash ? column.collect{|k,v| k}.first.to_sym : column
+      encryption_key = column.delete(:encryption_key)
+      
+      column_name, class_type = column.to_a.flatten
 
       @tableless_models ||= []
       @tableless_models << column_name
       
       
-      # if only the column name is given, the tableless model's class is expected to have that name, classified, as class name
-      class_type = column.class == Hash ? column.collect{|k,v| v}.last : column.to_s.classify.constantize
-
-
       # injecting in the parent object a getter and a setter for the
       # attribute that will store an instance of a tableless model
       class_eval do
 
         # Telling AR that the column has to store an instance of the given tableless model in 
-        # YAML serialized format
-        serialize column_name
+        # YAML serialized format; if encryption is enabled, then serialisation/deserialisation will
+        # be handled when encrypting/decrypting, rather than automatically by ActiveRecord,
+        # otherwise the different object id would cause a different serialisation string each time
+        
+        serialize column_name unless encryption_key
     
         # Adding getter for the serialized column,
         # making sure it always returns an instance of the specified tableless
         # model and not just a normal hash or the value of the attribute in the database,
         # which is plain text
         define_method column_name.to_s do
-          instance = class_type.new(read_attribute(column_name.to_sym) || {})
+          serialised = read_attribute(column_name) 
+          
+          value = if encryption_key
+            serialised ? YAML::load(ActiveSupport::MessageEncryptor.new(encryption_key).decrypt(serialised)) : serialised
+          else
+            serialised || {}
+          end
+
+          instance   = class_type.new(value)
           
           instance.__owner_object         = self
           instance.__serialized_attribute = column_name
@@ -61,7 +69,9 @@ module Base
         # making sure it always stores in it an instance of 
         # the specified tableless model (as the argument may also be a regular hash)
         define_method "#{column_name.to_s}=" do |value|
-          super class_type.new(value)
+          v = class_type.new(value)
+          v = encryption_key ? ActiveSupport::MessageEncryptor.new(encryption_key).encrypt(YAML::dump(v)) : v
+          super v
         end
       end
     end

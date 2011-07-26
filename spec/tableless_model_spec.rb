@@ -1,8 +1,5 @@
 require "spec_helper"
 
-ActiveRecord::Base.establish_connection(:adapter => "sqlite3", :database => ":memory:")
-ActiveRecord::Base.connection.execute(" create table test_models (id integer, options varchar(50)) ")
-
 class ModelOptions < ActiveRecord::TablelessModel
   attribute :no_default_value_no_type_attribute
   attribute :no_default_value_typed_attribute, :type => :integer 
@@ -112,7 +109,7 @@ describe TestModel do
       end
     end
   end
-  
+
   describe "#options" do
     it "is an instance of the tableless model" do
       options.should be_instance_of ModelOptions

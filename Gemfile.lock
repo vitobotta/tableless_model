@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    tableless_model (0.0.7)
+    tableless_model (0.0.9)
       validatable
 
 GEM
