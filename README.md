@@ -284,6 +284,9 @@ x.valid?
 
 ## Change log
 
+26.07.2011
+  - Added support for encryption
+  
 24.07.2011 
   - Added support for passing Proc/lamba when defining the default attribute of a value
   - Added shortcuts to call getters/setters of attributes defined in a tableless model, from
