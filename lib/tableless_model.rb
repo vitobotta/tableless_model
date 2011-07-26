@@ -1,6 +1,8 @@
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 
 require "validatable"
+require "active_record"
+require "active_support"
 require "activerecord/base/class_methods"
 require "activerecord/base/instance_methods"
 require "tableless_model/class_methods"
