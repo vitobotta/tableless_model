@@ -73,6 +73,7 @@ module Base
           v = encryption_key ? ActiveSupport::MessageEncryptor.new(encryption_key).encrypt(YAML::dump(v)) : v
           super v
         end
+        
       end
     end
 
