@@ -6,7 +6,7 @@ class ModelOptions < ActiveRecord::TablelessModel
   attribute :no_type_attribute, :default => 111
   attribute :typed_attribute,   :default => 5, :type => :integer 
   attribute :typed_attribute_no_default_value,  :type => :integer 
-  attribute :attribute_with_proc_default_value, :type => :time, :default => lambda { Time.now }  
+  attribute :attribute_with_proc_default_value, :type => :time, :default => lambda { Time.now.utc }  
 end
 
 class TestModel < ActiveRecord::Base
@@ -16,7 +16,7 @@ end
 describe TestModel do
   let(:test_model)  { subject }
   let(:options)     { test_model.options }  
-  let(:frozen_time) { Time.local(2011, 7, 24, 18, 47, 0).in_time_zone("Europe/London") }
+  let(:frozen_time) { Time.now.utc }
   let(:test_values) do
     {
       :no_default_value_no_type_attribute => "no_default_value_no_type_attribute",
@@ -170,7 +170,7 @@ describe TestModel do
     it "shows the expected object-like output on inspect" do
       Timecop.freeze(frozen_time) do
         instance = TestModel.new
-        instance.options.inspect.should == "<#ModelOptions attribute_with_proc_default_value=2011-07-24 18:47:00 BST no_default_value_no_type_attribute=\"\" no_default_value_typed_attribute=0 no_type_attribute=\"111\" typed_attribute=5 typed_attribute_no_default_value=0>"
+        instance.options.inspect.should == "<#ModelOptions attribute_with_proc_default_value=#{ frozen_time.to_s } no_default_value_no_type_attribute=\"\" no_default_value_typed_attribute=0 no_type_attribute=\"111\" typed_attribute=5 typed_attribute_no_default_value=0>"
       end
     end
     

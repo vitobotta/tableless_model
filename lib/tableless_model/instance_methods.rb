@@ -46,9 +46,10 @@ module Tableless
     # so that only the defined attributes can be set
     # 
     def []=(attribute_name, value)
-      raise NoMethodError, "The attribute #{attribute_name} is undefined" unless self.class.attributes.has_key? attribute_name
+      # raise NoMethodError, "The attribute #{attribute_name} is undefined"  unless self.class.attributes.keys.map(&:to_s).include? attribute_name.to_s
+      raise NoMethodError, "The attribute #{attribute_name} is undefined"  unless self.class.attributes.has_key? attribute_name.to_sym
       
-      return_value = super(attribute_name, self.class.cast(attribute_name, value))
+      return_value = super(attribute_name, self.class.cast(attribute_name.to_sym, value))
 
       if self.__owner_object 
         # This makes the tableless model compatible with partial_updates:
@@ -103,7 +104,7 @@ module Tableless
       end
     end
 
-    def respond_to?(method)
+    def respond_to?(method, *args)
       super || self.class.attributes.keys.include?(method) || self.class.attributes.keys.include?("#{method}=".to_sym) || super(method.to_s.gsub(/^(.*)\?$/, "\\1"))
     end
 
