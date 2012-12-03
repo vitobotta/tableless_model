@@ -122,7 +122,7 @@ describe TestModel do
         test_model.options.no_type_attribute.should == "111"
         test_model.options.typed_attribute.should == 5
         test_model.options.typed_attribute_no_default_value.should == 0
-        test_model.options.attribute_with_proc_default_value.should == frozen_time
+        test_model.options.attribute_with_proc_default_value.to_i.should == frozen_time.to_i
       end
     end
     
@@ -164,7 +164,7 @@ describe TestModel do
     it "does not allow merging, since the tableless mode is supposed to be used like a normal model, not a hash" do
       expect { 
         options.merge(:some_new_attribute => "whatever") 
-      }.should raise_error NoMethodError
+      }.to raise_error NoMethodError
     end
     
     it "shows the expected object-like output on inspect" do
@@ -224,7 +224,7 @@ describe TestModel do
       context "and a new instance of the parent model is being created" do
         it "allows passing a Proc/lambda to define a default value at runtime" do
           Timecop.freeze(frozen_time) do
-            TestModel.new.options.attribute_with_proc_default_value.should == frozen_time
+            TestModel.new.options.attribute_with_proc_default_value.to_i.should == frozen_time.to_i
           end
         end
       end
